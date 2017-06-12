@@ -17,7 +17,14 @@
     "test:browser": "budo test -- -t babelify -t es2040"
   },
   "babel": {
-    "plugins": [ [ "transform-react-jsx", { "pragma": "h" } ] ]
+    "plugins": [
+      [
+        "transform-react-jsx",
+        {
+          "pragma": "h"
+        }
+      ]
+    ]
   },
   "devDependencies": {
     "babel-plugin-transform-react-jsx": "^6.24.1",
