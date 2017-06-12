@@ -3,7 +3,7 @@
 
 > Persist hyperapp state between sessions 
 
-A [hyperapp plugin](https://github.com/hyperapp/hyperapp) that provides an way to restore state from a previous session (using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)`).  It simply exposes `state.previous`, and then saves the app state on the [`unload` event](https://developer.mozilla.org/en-US/docs/Web/Events/unload).
+A [hyperapp plugin](https://github.com/hyperapp/hyperapp) that provides an way to restore state from a previous session (using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)).  It simply exposes `state.previous`, and then saves the app state on the [`unload` event](https://developer.mozilla.org/en-US/docs/Web/Events/unload).
 
 ```js
 var { h, app } = require('hyperapp')
