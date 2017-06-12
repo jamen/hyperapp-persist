@@ -24,8 +24,8 @@ app({
       ({ counter: state.previous.counter }),
   
     // Counter actions
-    up: ({ counter }) => ({ counter: counter + 1 }),
-    down: ({ counter }) => ({ counter: counter - 1 }),
+    up: state => ({ counter: state.counter + 1 }),
+    down: state => ({ counter: state.counter - 1 }),
   },
 
   events: {
