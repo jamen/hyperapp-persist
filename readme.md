@@ -1,13 +1,13 @@
 
-# hyperapp-persis
+# hyperapp-persist
 
 > Persist hyperapp state between sessions 
 
-A [hyperapp plugin](https://github.com/hyperapp/hyperapp) that provides an way to restore state from a previous session (using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)).  It simply exposes `state.previous`, and then saves the app state on the [`unload` event](https://developer.mozilla.org/en-US/docs/Web/Events/unload).
+A [hyperapp](https://github.com/hyperapp/hyperapp) [plugin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#plugins) that provides an way to restore state from a previous session (using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)).  It simply exposes `state.previous`, and then saves the app state on the [`unload` event](https://developer.mozilla.org/en-US/docs/Web/Events/unload).
 
 ```js
 var { h, app } = require('hyperapp')
-var persist = require('hypeerapp-persist')
+var persist = require('hyperapp-persist')
 
 app({
   // Load persist + any other plugins
@@ -51,11 +51,11 @@ app({
 npm i -g hyperapp-persist
 ```
 
-Use [Browserify](http://npmjs.com/browserify) (and similar) to bundle for the browser.
+Use [Browserify](http://npmjs.com/browserify) (or a similar package) to bundle for the browser.
 
 ## Usage
 
-This plugin only gives you `state.previous`, and your job is to load the previous state into your new state how you like.  This is not difficult at all.  Just define [an a new action](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#actions) to restores the state:
+This plugin only gives you `state.previous`, and your job is to load the previous state into your new state how you like.  This is not difficult at all.  Just define [a new action](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#actions) to restore the state:
 
 ```js
 restorePreviousState: (state) =>
@@ -101,8 +101,8 @@ restorePlayerTime: (state) =>
 
 An action that forces a session state save.  Note that **you don't need this** since it is automatically executed by the `persist` plugin when your app exits.
 
-```
-// What is implemented in `persis`
+```js
+// What is implemented in `persist`
 window.addEventListener('unload', function () {
   actions.saveSessionState()
 })
