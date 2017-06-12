@@ -2,7 +2,7 @@
   "name": "hyperapp-persist",
   "description": "Persist hyperapp state between sessions",
   "author": "Jamen Marz (https://git.io/jamen)",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "keywords": [
     "hyperapp",
