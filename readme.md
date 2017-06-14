@@ -10,36 +10,31 @@ var { h, app } = require('hyperapp')
 var persist = require('hyperapp-persist')
 
 app({
-  // Load persist + any other plugins
   plugins: [ persist ],
 
-  // Define a state as normal
-  state: {
-    counter: 0
-  },
+  // App's initial state state
+  state: { count: 0 },
 
   actions: {
-    // Restore state from previous session using `state.previous`
+    // Restores the count from the last session
     restorePreviousState: state => 
-      ({ counter: state.previous.counter }),
+      ({ count: state.previous.count }),
   
-    // Counter actions
-    up: state => ({ counter: state.counter + 1 }),
-    down: state => ({ counter: state.counter - 1 }),
+    up: state => ({ count: state.count + 1 }),
+    down: state => ({ count: state.count - 1 }),
   },
 
+  // When the app loads, check for a previous state and restore it.
   events: {
     loaded: (state, actions) => {
-      // Restore a previous state when app loads
       if (state.previous) actions.restorePreviousState()
     }
   },
 
-  // View counter
   view: (state, actions) =>
     <div class='counter'>
       <button onclick={actions.up}>+</button>
-      <span>{state.counter}</span>
+      <span>{state.count}</span>
       <button onclick={actions.down}>-</button>
     </div>
 })
@@ -55,7 +50,7 @@ Use [Browserify](http://npmjs.com/browserify) (or a similar package) to bundle f
 
 ## Usage
 
-This plugin only gives you `state.previous`, and your job is to load the previous state into your new state how you like.  This is not difficult at all.  Just define [a new action](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#actions) to restore the state:
+You get `state.previous` to load the previous state into the current state by simply defining a `action`:
 
 ```js
 restorePreviousState: (state) =>
@@ -71,6 +66,8 @@ events: {
   }
 }
 ```
+
+This gives you flexibility about what the persist and when to enable it, while keeping the `localStorage` logic hidden.
 
 ### `persist`
 
