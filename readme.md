@@ -62,22 +62,19 @@ restorePreviousState: (state) =>
   ({ counter: state.previous.counter })
 ```
 
-Then run this when the app loads
+Then when the app loads, or the user confirms they'd like to restore, run it:
 
 ```js
 events: {
   loaded: (state, actions) => {
     if (state.previous) actions.restorePreviousState()
-    // ...
   }
 }
 ```
 
-Making sure to check that `state.previous` exists.
-
 ### `persist`
 
-The [plugin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#plugins) that persists your app state across sessions.  Loaded by:
+The [plugin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#plugins) function that persists your app state across sessions.  Loaded by:
 
 ```js
 app({
@@ -86,16 +83,18 @@ app({
 })
 ```
 
-It exposes `state.previous` and `actions.saveSessionState`, and saves your app state on `unload`.
+It exposes `state.previous` for you to create an action, and also `actions.saveSessionState` which is ran automatically when your app exits.
 
 ### `state.previous`
 
-The state object of the previous session.  Used inside actions to "restore" the last session:
+The `state` object from the previous session.  Used inside actions to restore it into the current session's state.
 
 ```js
 restorePlayerTime: (state) =>
   ({ player: { time: state.previous.player.time } })
 ```
+
+If there is no state from the previous session (i.e. a new user, or cache cleared) then `state.previous` will be `null`.  Check this before running the restore action, so you don't try and restore the current state to nothing.
 
 ### `actions.saveSessionState`
 
