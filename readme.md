@@ -49,14 +49,14 @@ Use [Browserify](http://npmjs.com/browserify) (or a similar package) to bundle f
 
 ## Usage
 
-You get `state.previous` to load the previous state into the current state by simply defining a `action`:
+Restore data from `state.previous` into the current state by creating an action.
 
 ```js
 restorePreviousState: (state) =>
   ({ counter: state.previous.counter })
 ```
 
-Then when the app loads, or the user confirms they'd like to restore, run it:
+Then when the app loads, or the user confirms they'd like to restore old state, run it.
 
 ```js
 events: {
@@ -66,11 +66,11 @@ events: {
 }
 ```
 
-This lets you choose which state to persist and when to enable it, while keeping the `localStorage` logic hidden.
+This flexibility lets you choose which state to persist and when to enable it, while keeping the `localStorage` logic hidden.
 
 ### `persist`
 
-Loads the `localStorage` + `unload` code to persist your state between session as `state.previous`
+Save the state in `localStorage` when the app exits, to be accessed next load as `state.previous`
 
 ```js
 app({
