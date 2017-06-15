@@ -2,34 +2,59 @@ var { h, app } = require('hyperapp')
 var persist = require('../')
 
 app({
-  // Load persist + any other plugins
-  plugins: [ persist ],
+  // Load persist plugin
+  plugins: [
+    persist({
+      storage: 'test',
+      ignore: [ 'other' ]
+    })
+  ],
 
-  // Define a state as normal
+  // (App state as normal)
   state: {
-    counter: 0
+    count: 0,
+    input: 'foobar',
+    other: 'this should not apear in local storage',
+    // Try adding a property after a few sessions to increment the version. This
+    // invalidates the outdated state and tosses it (unless you pass opts.rescue)
+    // newState: 123
   },
 
   actions: {
-    // Restore state from previous session using `state.previous`
-    restorePreviousState: state => 
-      ({ counter: state.previous.counter }),
+    // Your action that restores previous state into the current state
+    restorePreviousState: state => ({
+      count: state.previous.count,
+      input: state.previous.input
+    }),
   
-    up: ({ counter }) => ({ counter: counter + 1 }),
-    down: ({ counter }) => ({ counter: counter - 1 }),
+    // (Other input actions)
+    increment: state =>
+      ({ count: state.count + 1 }),
+
+    decrement: state =>
+      ({ count: state.count - 1 }),
+
+    input: (state, _a, value) =>
+      ({ input: value })
   },
 
-  // Run the action when the app loads
   events: {
     loaded: (state, actions) => {
+      // If there was a previous session, restore it
       if (state.previous) actions.restorePreviousState()
     }
   },
 
+  // (App view)
   view: (state, actions) =>
     <div class='counter'>
-      <button onclick={actions.up}>+</button>
-      <span>{state.counter}</span>
-      <button onclick={actions.down}>-</button>
+      <button onclick={actions.increment}>+</button>
+      <span>{state.count}</span>
+      <button onclick={actions.decrement}>-</button>
+      <br />
+      <input
+        type='text'
+        oninput={e => actions.input(e.target.value)}
+        value={state.input} />
     </div>
 })
