@@ -109,7 +109,7 @@ You can provide the options
 
 The `state` object from the previous session.  Used inside actions to restore it into the current session's state.
 
-If there is no state from the previous session (i.e. a new user, cache cleared) then `state.previous` will be `null`.  It will also be `null` if `opts.rescue` is not enabled and `state.version !== `state.previous.version`.`
+If there is no state from the previous session (i.e. a new user, cache cleared) then `state.previous` will be `null`.  It will also be `null` if `opts.rescue` is not enabled and `state.version !== state.previous.version`.`
 
 ```js
 restorePlayerTime: (state) =>
