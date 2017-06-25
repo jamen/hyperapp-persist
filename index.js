@@ -2,10 +2,10 @@
 module.exports = function persist (options) {
   if (!options) options = {}
 
-  var ignore = options.ignore
-  var rescue = options.rescue
+  var ignore = options.ignore || []
   var storage = options.storage || 'hyperapp-persist-state'
-
+  var rescue = options.rescue
+  
   function ignoreOnSave (key, value) {
     if (key !== 'previous' && ignore.indexOf(key) === -1) return value
   }
@@ -48,6 +48,7 @@ module.exports = function persist (options) {
 }
 
 function incompatible (state, previous, ignore) {
+  if (state !== null && previous === null) return false
   if (typeof state !== 'object' || typeof previous !== 'object') {
     return typeof state === typeof previous
   }
