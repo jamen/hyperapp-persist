@@ -3,10 +3,10 @@ var persist = require('../')
 
 app({
   // Load persist plugin
-  plugins: [
+  mixins: [
     persist({
-      storage: 'test',
-      ignore: [ 'other' ]
+      ignore: [ 'other' ],
+      storage: 'hyperapp-testing',
     })
   ],
 
@@ -14,17 +14,14 @@ app({
   state: {
     count: 0,
     input: 'foobar',
-    other: 'this should not apear in local storage',
-    // Try adding a property after a few sessions to increment the version. This
-    // invalidates the outdated state and tosses it (unless you pass opts.rescue)
-    // newState: 123
+    other: 'this should not apear in local storage'
   },
 
   actions: {
     // Your action that restores previous state into the current state
-    restorePreviousState: state => ({
-      count: state.previous.count,
-      input: state.previous.input
+    restore: (state, actions, previous) => ({
+      count: previous.count,
+      input: previous.input
     }),
   
     // (Other input actions)
@@ -39,9 +36,11 @@ app({
   },
 
   events: {
-    loaded: (state, actions) => {
-      // If there was a previous session, restore it
-      if (state.previous) actions.restorePreviousState()
+    persist: (state, actions, previous) => {
+      actions.restore(previous)
+    },
+    'persist:failed': (state, actions, previous) => {
+      console.log(previous)
     }
   },
 

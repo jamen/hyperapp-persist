@@ -3,137 +3,104 @@
 
 > Persist an app's state to the next session
 
-A [hyperapp](https://github.com/hyperapp/hyperapp) [plugin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#plugins) that stores the app's state using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) [on `unload`](https://developer.mozilla.org/en-US/docs/Web/Events/unload) so you are able to restore some from `state.previous` next session.  For example: page location, video/audio player time, checkout list, unsaved user input, HRM, etc.
+A [HyperApp](https://github.com/hyperapp/hyperapp) [mixin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#mixins) that stores state in [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) on [`window.unload`](https://developer.mozilla.org/en-US/docs/Web/Events/unload) so you can restore it next the session. For example: media player state, checkout items list, or unsaved forms or inputs.
 
-When the previous state becomes incompatible with the current state, `state.version` is incremented.  By default `state.previous` will be tossed if the versions aren't equal, and the user starts from scratch.  But if you require more strict support, you can pass `opts.rescue` and restore the state by verison.
+```js
+mixin: [
+  persist()
+]
+```
+
+Then, get a `persist` event containing the previous state:
+
+```js
+events: {
+  persist: (state, actions, previous) => {
+    actions.restore(previous)
+  }
+}
+```
+
+M
+Learn more about the mixin in [Usage section](#usag
 
 ## Install
 
 ```sh
-npm i -g hyperapp-persist
+npm i hyperapp-persist
 ```
 
 Use [Browserify](http://npmjs.com/browserify) (or a similar package) to bundle for the browser.
 
 ## Usage
 
-Start by loading persist in `plugins`
+### `persist(options?)`
 
-```js
-var { h, app } = require('hyperapp')
-var persist = require('hyperapp-persist')
+Mixin that persists the state given `options` (not required).
 
-app({
-  // Load persist plugin
-  plugins: [ persist() ],
-```
-
-Then define a normal app state
-
-```js
-  state: {
-    count: 0,
-    input: 'foobar',
-  },
-```
-
-Define an action that restores values from `state.previous`
-
-```js
-  actions: {
-    // Your action that restores previous state into the current state
-    restorePreviousState: state => ({
-      count: state.previous.count,
-      input: state.previous.input
-    }),
-  
-    increment: state =>
-      ({ count: state.count + 1 }),
-
-    decrement: state =>
-      ({ count: state.count - 1 }),
-
-    input: (state, _a, value) =>
-      ({ input: value })
-  },
-```
-
-Then when the app loads, check if there was a previous session and restore it
-
-```js
-  events: {
-    loaded: (state, actions) => {
-      // If there was a previous session, restore it
-      if (state.previous) actions.restorePreviousState()
-    }
-  },
-```
-
-And a view to tie it together
-
-```js
-  view: (state, actions) =>
-    <div class='counter'>
-      <button onclick={actions.increment}>+</button>
-      <span>{state.count}</span>
-      <button onclick={actions.decrement}>-</button>
-      <br />
-      <input
-        type='text'
-        oninput={e => actions.input(e.target.value)}
-        value={state.input} />
-    </div>
-})
-```
-
-See [test/index.js](test/index.js) for another example with more.
-
-### `persist(opts?)`
-
-A plugin that saves state in `localStorage` when the app exits, to be accessed next session as `state.previous`
+ - `ignore` (`Array`): Keys on the `state` you don't want to persist. Defaults to none
+ - `storage` (`String`): Where state is saved on `localStorage`. Defaults to `'hyperapp-persist'`
 
 ```js
 app({
-  plugins: [ persist() ],
-  // ...
+  mixin: [ persist() ]
 })
 ```
 
-You can provide the options
-
- - `storage`: The name on `localStorage` where state is saved.  Defaults to `hyperapp-persist-state`
- - `ignore`: An array of keys which are not saved or restored between sessions
- - `rescue`: Opts-out of starting a new state when the previous state is incompatible, so you can rescue it
-
-### `state.previous`
-
-The `state` object from the previous session.  Used inside actions to restore it into the current session's state.
-
-If there is no state from the previous session (i.e. a new user, cache cleared) then `state.previous` will be `null`.  It will also be `null` if `opts.rescue` is not enabled and `state.version !== state.previous.version`.`
+Or with options:
 
 ```js
-restorePlayerTime: (state) =>
-  ({ player: { time: state.previous.player.time } })
+app({
+  mixin: [
+   persist({
+      ignore: [ 'secrets' ],
+      storage: 'hyperapp-persist'
+    })
+  ]
+})
 ```
 
-### `state.version`
+### `persist` event
 
-A number that is incremented and saved when the previous state becomes incompatible with the current state.  i.e. properties are removed or added.
+Emitted when there is a previous state and it can be restored.
 
-You can use this to restore older states into a new state by passing `opts.rescue`.  Otherwise it is used to automatically invalidate `state.previous` so you don't accidently try and restore and outdated object.
+Comes with a `previous` parameter, which you pass off into one of your own actions.
 
 ```js
-if (!state.previous) {
-  // The session has no previous state
-} else if (state.version === state.previous.version) {
-  // The previous state is compatible with the current state
-} else {
-  // The saved state is not compatible, rescue versions individually
-  switch (state.previous.version) {
-    case 1: ...
-    case 2: ...
+actions: {
+  restore: (state, actions, previous) => ({
+    count: previous.count,
+    input: previous.input,
     // ...
+  })
+},
+events: {
+  persist: (state, actions, previous) => {
+    actions.restore(previous)
   }
 }
 ```
+
+### `persist:failed` event
+
+Emitted when there is a previous state but it is incompatible with the current state.
+
+```js
+events: {
+  persist: (_, actions, previous) => actions.restore(previous),
+  'persist:failed': (_, actions, previous) => {
+    // Incompatible states.  Guess some old state keys?
+  }
+}
+```
+
+It is not required to use this.  Without it, the user starts from scratch and the incompatible state is never utilzied.
+
+### `actions.persist.cancel()`
+
+Prevents the state from saving this session
+
+### `actions.persist.save()`
+
+Saves the state manually.  This is triggered automatically with `window.onunload` event
 
