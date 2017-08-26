@@ -37,7 +37,7 @@ module.exports = function persist (options) {
         }
       },
       events: {
-        init: function (state, actions) {
+        load: function (state, actions) {
           // Trigger proper event, checking compatibility
           var evt = incompatible(state, previous, ignore)
             ? 'persist:failed'
