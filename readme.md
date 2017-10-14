@@ -3,7 +3,7 @@
 
 > Persist an app's state between sessions
 
-Use this [Hyperapp](https://github.com/hyperapp/hyperapp) HOA (Higher-Order App) to persist the state between sessions.  When the page unloads the state is saved in `localStorage` and restored on the next load.
+Use this [Hyperapp](https://github.com/hyperapp/hyperapp) HOA (Higher-Order App) to persist the state between sessions.  As the page unloads the state is saved in `localStorage`, and then the it is restored on the next load.
 
 <!-- Add screencast demo -->
 
@@ -15,7 +15,7 @@ npm i hyperapp-persist
 
 ## Usage
 
-## `persist(app, options)`
+### `persist(app, options)`
 
 Persist is a Higher-Order App that bootstraps the `app()`.
 
@@ -24,7 +24,7 @@ The options required are:
  - `storage` where the state is saved on `localStorage`
  - `include` to specify what state gets saved
 
-```
+```js
 import { app } from 'hyperapp'
 import persist from 'hyperapp-persist'
 
