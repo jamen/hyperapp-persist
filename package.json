@@ -3,7 +3,7 @@
   "description": "Persist an app's state to the next session",
   "author": "Jamen Marz (https://git.io/jamen)",
   "repository": "jamen/hyperapp-persist",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "license": "MIT",
   "keywords": [
     "hyperapp",
