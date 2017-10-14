@@ -1,28 +1,11 @@
 
 # hyperapp-persist
 
-> Persist an app's state to the next session
+> Persist an app's state between sessions
 
-A [HyperApp](https://github.com/hyperapp/hyperapp) [mixin](https://github.com/hyperapp/hyperapp/blob/master/docs/core.md#mixins) that stores state in [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) on [`window.unload`](https://developer.mozilla.org/en-US/docs/Web/Events/unload) so you can restore it next the session. For example: media player state, checkout items list, or unsaved forms or inputs.
+Use this [Hyperapp](https://github.com/hyperapp/hyperapp) HOA (Higher-Order App) to persist the state between sessions.  When the page unloads the state is saved in `localStorage` and restored on the next load.
 
-```js
-mixin: [
-  persist()
-]
-```
-
-Then, get a `persist` event containing the previous state:
-
-```js
-events: {
-  persist: (state, actions, previous) => {
-    actions.restore(previous)
-  }
-}
-```
-
-M
-Learn more about the mixin in [Usage section](#usag
+<!-- Add screencast demo -->
 
 ## Install
 
@@ -30,77 +13,50 @@ Learn more about the mixin in [Usage section](#usag
 npm i hyperapp-persist
 ```
 
-Use [Browserify](http://npmjs.com/browserify) (or a similar package) to bundle for the browser.
-
 ## Usage
 
-### `persist(options?)`
+## `persist(app, options)`
 
-Mixin that persists the state given `options` (not required).
+Persist is a Higher-Order App that bootstraps the `app()`.
 
- - `ignore` (`Array`): Keys on the `state` you don't want to persist. Defaults to none
- - `storage` (`String`): Where state is saved on `localStorage`. Defaults to `'hyperapp-persist'`
+The options required are:
 
-```js
+ - `storage` where the state is saved on `localStorage`
+ - `include` to specify what state gets saved
+
+```
+import { app } from 'hyperapp'
+import persist from 'hyperapp-persist'
+
+app = persist(app, {
+  storage: 'my-app/v1',
+  include: [ 'router', 'player' ]
+})
+
 app({
-  mixin: [ persist() ]
+  // ...
 })
 ```
 
-Or with options:
+Also possible to use environment variables to remove it in production:
 
 ```js
-app({
-  mixin: [
-   persist({
-      ignore: [ 'secrets' ],
-      storage: 'hyperapp-persist'
-    })
-  ]
+if (process.env.DEV) {
+  app = persist(app, { ... })
+}
+```
+
+### Versioning the storage
+
+Sometimes when developing an app, you'll change the state in a way incompatible with what all your users have saved.  In this case, it is recommended you version the `storage` key.  For example:
+
+```js
+app = persist(app, {
+  storage: 'my-app/1',
+  include: [ 'inputs', 'router', ... ]
 })
 ```
 
-### `persist` event
+Then if a breaking change is made you increment the number to `my-app/2` and so on.
 
-Emitted when there is a previous state and it can be restored.
-
-Comes with a `previous` parameter, which you pass off into one of your own actions.
-
-```js
-actions: {
-  restore: (state, actions, previous) => ({
-    count: previous.count,
-    input: previous.input,
-    // ...
-  })
-},
-events: {
-  persist: (state, actions, previous) => {
-    actions.restore(previous)
-  }
-}
-```
-
-### `persist:failed` event
-
-Emitted when there is a previous state but it is incompatible with the current state.
-
-```js
-events: {
-  persist: (_, actions, previous) => actions.restore(previous),
-  'persist:failed': (_, actions, previous) => {
-    // Incompatible states.  Guess some old state keys?
-  }
-}
-```
-
-It is not required to use this.  Without it, the user starts from scratch and the incompatible state is never utilzied.
-
-### `actions.persist.cancel()`
-
-Prevents the state from saving this session
-
-### `actions.persist.save()`
-
-Saves the state manually.  This is triggered automatically with `window.onunload` event
 
